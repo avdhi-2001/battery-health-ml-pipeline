@@ -55,6 +55,7 @@ The anomaly model flagged 139 unusual cycles — mostly from two batteries runni
 - Pickle for saving and loading models
 
 ## Project Structure
+```
 battery-health-ml-pipeline/
 ├── battery_exploration.ipynb
 ├── dashboard.py
@@ -64,6 +65,7 @@ battery-health-ml-pipeline/
 ├── merged_df.csv
 ├── battery_aging.png
 └── README.md
+```
 
 ## How to Run
 
