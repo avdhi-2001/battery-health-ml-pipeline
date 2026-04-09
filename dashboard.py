@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+from sqlalchemy import create_engine
 
 st.set_page_config(
     page_title="Battery Health Monitor",
@@ -329,9 +330,43 @@ def load_models():
         model_anomaly = pickle.load(f)
     return model_soh, model_rul, model_anomaly
 
-@st.cache_data
+from sqlalchemy import create_engine
+
+DB_URL = 'postgresql://avdhipagaria@localhost:5432/battery_health_db'
+
+@st.cache_data(ttl=10)
 def load_data():
-    return pd.read_csv('merged_df.csv')
+    engine = create_engine(DB_URL)
+    
+    # Load predictions from PostgreSQL
+    df = pd.read_sql(
+        'SELECT * FROM battery_predictions', 
+        engine
+    )
+    
+    # Load anomalies from PostgreSQL
+    anomalies_db = pd.read_sql(
+        'SELECT * FROM anomaly_alerts', 
+        engine
+    )
+    
+    # Add anomaly label to main df
+    df['anomaly_label'] = 'Normal'
+    
+    for _, row in anomalies_db.iterrows():
+        mask = (
+            (df['battery_id'] == row['battery_id']) & 
+            (df['cycle_number'] == row['cycle_number'])
+        )
+        df.loc[mask, 'anomaly_label'] = 'Anomaly'
+    
+    # Rename columns to match dashboard
+    df = df.rename(columns={
+        'soh': 'SoH',
+        'rul': 'RUL'
+    })
+    
+    return df
 
 model_soh, model_rul, model_anomaly = load_models()
 df = load_data()
