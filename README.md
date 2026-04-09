@@ -90,9 +90,3 @@ streamlit run dashboard.py
 ## Challenges
 
 The trickiest part was not the model training — it was getting the data pipeline right. The dataset has 7,565 files with slightly different column structures depending on the test type. Merging everything correctly without losing the battery identity column took a few attempts. Two batteries had near zero voltage readings in some cycles which caused NaN values in the SoH calculation. Investigating those taught me not to clean data blindly without first understanding why the values are missing.
-
-## What is Next
-
-- PostgreSQL integration to store predictions and battery history
-- Apache Airflow to automate the full pipeline on a schedule
-- Real time data simulation to mimic live BMS telemetry streaming
